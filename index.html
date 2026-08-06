@@ -1,0 +1,371 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Obra Nova V7.1 Produtividade</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="overlay" class="overlay"></div>
+  <aside id="drawer" class="drawer">
+    <div class="logo-wrap">
+      <img id="brandLogoMenu" class="brand-logo" alt="logo">
+      <div id="brandBadge" class="brand-badge">ON</div>
+      <div class="logo-box" id="logoBox">Obra Nova</div>
+    </div>
+    <div class="menu-title">Principal</div>
+    <button class="menu-item active" data-section="dashboard">📊 Dashboard</button>
+    <button class="menu-item" data-section="cadastro">📁 Cadastro</button>
+    <button class="menu-item" data-section="orcamentos">📑 Orçamentos</button>
+    <button class="menu-item" data-section="almoxarife">📦 Almoxarife</button>
+    <button class="menu-item" data-section="financeiro">💰 Financeiro</button>
+    <button class="menu-item" data-section="sistema">⚙️ Sistema</button>
+  </aside>
+
+  <header>
+    <div class="top-left">
+      <button class="icon-btn" id="btnMenu">☰</button>
+      <div>
+        <div class="module-label">Sistema</div>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+      </div>
+    </div>
+    <div class="top-right">
+      <button class="icon-btn" id="btnTheme">☼</button>
+      <div class="avatar" id="avatarBrand">ON</div>
+    </div>
+  </header>
+
+  <main>
+    <section id="dashboard" class="section active">
+      <div class="top-row"><h2>Dashboard</h2></div>
+      <div class="dashboard-grid" id="dashboardKpis"></div>
+      <div class="box"><h3>Resumo executivo</h3><div id="dashboardResumo" class="quick-grid"></div></div>
+    </section>
+
+    <section id="cadastro" class="section">
+      <div class="top-row"><h2>Cadastro</h2></div>
+      <div class="subtabs">
+        <button class="subtab active" data-parent="cadastro" data-sub="cadastro-clientes">Clientes</button>
+        <button class="subtab" data-parent="cadastro" data-sub="cadastro-obras">Obras</button>
+      </div>
+
+      <div id="cadastro-clientes" class="subpanel active">
+        <div class="box">
+          <h2>Clientes</h2>
+          <div class="form-grid">
+            <div><label>Nome / Razão social</label><input id="clienteNome"></div>
+            <div><label>CPF / CNPJ</label><input id="clienteDocumento"></div>
+            <div><label>Telefone / WhatsApp</label><input id="clienteTelefone"></div>
+            <div><label>E-mail</label><input id="clienteEmail" type="email"></div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="btnSalvarCliente">Salvar cliente</button>
+            <button class="btn-secondary" id="btnCancelarCliente">Cancelar</button>
+          </div>
+        </div>
+        <div class="box"><div id="clientesTable"></div></div>
+      </div>
+
+      <div id="cadastro-obras" class="subpanel">
+        <div class="box">
+          <h2>Obras</h2>
+          <div class="form-grid">
+            <div><label>Nome da obra</label><input id="obraNome"></div>
+            <div><label>Código</label><input id="obraCodigo"></div>
+            <div><label>Cliente vinculado</label><select id="obraCliente"></select></div>
+            <div><label>Status</label><select id="obraStatus"><option value="ativa">ativa</option><option value="planejamento">planejamento</option><option value="orçamento">orçamento</option><option value="concluída">concluída</option><option value="paralisada">paralisada</option></select></div>
+            <div><label>Tipo</label><select id="obraTipo"><option value="Residencial">Residencial</option><option value="Comercial">Comercial</option><option value="Industrial">Industrial</option><option value="Infraestrutura">Infraestrutura</option><option value="Reforma">Reforma</option></select></div>
+            <div><label>Área construída</label><input id="obraArea" type="number" min="0" step="0.01"></div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="btnSalvarObra">Salvar obra</button>
+            <button class="btn-secondary" id="btnCancelarObra">Cancelar</button>
+          </div>
+        </div>
+        <div id="obrasResumo" class="quick-grid"></div><br>
+        <div class="table-wrap"><table><thead><tr><th>Obra</th><th>Código</th><th>Cliente</th><th>Status</th><th>Tipo</th><th>Área</th><th>Ações</th></tr></thead><tbody id="obrasTable"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="orcamentos" class="section">
+      <div class="top-row"><h2>Orçamentos</h2></div>
+      <div class="subtabs">
+        <button class="subtab active" data-parent="orcamentos" data-sub="orc-base">Base</button>
+        <button class="subtab" data-parent="orcamentos" data-sub="orc-orcamento">Orçamento</button>
+        <button class="subtab" data-parent="orcamentos" data-sub="orc-proposta">Proposta</button>
+      </div>
+
+      <div id="orc-base" class="subpanel active">
+        <div class="box">
+          <h2>Base</h2>
+          <p class="small-note">Base técnica multirreferência. Esta versão carrega externamente todas as linhas úteis das três planilhas enviadas. Total previsto: 61035 referências.</p>
+          <div class="form-grid">
+            <div><label>Código</label><input id="compCodigo"></div>
+            <div><label>Referência</label><select id="compBase"><option>SINAPI</option><option>CUB</option><option>Própria</option><option>SICRO</option><option>TCPO</option><option>Fornecedor</option></select></div>
+            <div><label>Descrição</label><input id="compDescricao"></div>
+            <div><label>Unidade</label><input id="compUnidade"></div>
+            <div><label>Custo</label><input id="compCusto" type="number" min="0" step="0.01"></div>
+            <div><label>Categoria</label><input id="compCategoria" placeholder="Estrutura, Hidráulica..."></div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="btnSalvarComposicao">Salvar composição</button>
+            <button class="btn-secondary" id="btnCancelarComposicao">Cancelar</button>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="form-grid">
+            <div><label>Buscar por código / descrição</label><input id="filtroCompBusca" placeholder="Ex.: 97141 ou tubo PVC"></div>
+            <div><label>Filtrar categoria</label><input id="filtroCompCategoria" placeholder="Ex.: Hidráulica"></div>
+            <div><label>Filtrar referência</label><select id="filtroCompBase"><option value="">Todas</option><option value="Composição Sintética">Composição Sintética</option></select></div>
+          </div>
+          <div class="chip-row" id="chipsTipoBusca">
+            <button class="chip active" data-tipo="">Todos</button>
+            <button class="chip" data-tipo="INSUMOS">Insumos</button>
+            <button class="chip" data-tipo="MÃO DE OBRA">Mão de obra</button>
+            <button class="chip" data-tipo="EQUIPAMENTOS">Equipamentos</button>
+            <button class="chip" data-tipo="COMPOSIÇÃO">Composição</button>
+          </div>
+        </div>
+
+        <div class="box"><div id="compInfo" class="quick-grid"></div></div>
+        <div class="box"><div id="composicoesTable"></div></div>
+
+        <div class="box">
+          <h3>Mais usados</h3>
+          <div id="maisUsadosComp" class="mini-list"></div>
+        </div>
+      </div>
+
+      <div id="orc-orcamento" class="subpanel">
+        <div class="box">
+          <h2>Orçamento</h2>
+          <div class="form-grid">
+            <div><label>Obra</label><select id="orcObra"></select></div>
+            <div><label>Etapa</label><input id="orcEtapa"></div>
+            <div><label>Pesquisar composição</label><input id="orcBuscaRapida" placeholder="Digite código ou descrição..."></div>
+            <div><label>Código</label><input id="orcCodigoSelecionado" readonly></div>
+            <div><label>Descrição</label><input id="orcDescricao" readonly></div>
+            <div><label>Tipo</label><input id="orcTipoSelecionado" readonly></div>
+            <div><label>Referência</label><input id="orcReferenciaSelecionada" readonly></div>
+            <div><label>Quantidade</label><input id="orcQuantidade" type="number" min="0" step="0.01"></div>
+            <div><label>Preço unitário</label><input id="orcPrecoManual" type="number" min="0" step="0.01" readonly></div>
+            <div><label>Total prévio</label><input id="orcTotalPrevio" readonly></div>
+          </div>
+          <div class="box" style="padding:12px;margin-top:12px;margin-bottom:0;">
+            <h3 style="margin:0 0 10px;">Busca rápida — clique em Usar</h3><div class="small-note" style="margin-bottom:10px;">Ao escolher um item, a lista recolhe automaticamente. Ao adicionar, o formulário limpa e volta para a pesquisa.</div>
+            <div id="resultadosBuscaRapida" class="mini-list"></div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="btnSalvarOrcamento">Adicionar item</button>
+            <button class="btn-secondary" id="btnCancelarOrcamento">Cancelar</button>
+          </div>
+        </div>
+
+        <div class="box">
+          <h3>BDI por Obra</h3>
+          <div class="form-grid">
+            <div><label>Obra</label><select id="bdiObra"></select></div>
+            <div><label>Adm. central (%)</label><input id="bdiAdmCentral" type="number" step="0.01" value="0"></div>
+            <div><label>Adm. local (%)</label><input id="bdiAdmLocal" type="number" step="0.01" value="0"></div>
+            <div><label>Lucro (%)</label><input id="bdiLucro" type="number" step="0.01" value="0"></div>
+          </div>
+          <div class="actions"><button class="btn-primary" id="btnSalvarBDI">Salvar BDI</button></div>
+          <div id="bdiResultado" class="quick-grid"></div>
+        </div>
+
+        <div class="box"><div id="orcamentosTable"></div></div>
+      </div>
+
+      <div id="orc-proposta" class="subpanel">
+        <div class="box">
+          <h2>Proposta</h2>
+          <div class="form-grid">
+            <div><label>Obra</label><select id="propObra"></select></div>
+            <div><label>Prazo</label><input id="propPrazo" value="30 dias"></div>
+            <div><label>Validade</label><input id="propValidade" value="07 dias"></div>
+            <div><label>Pagamento</label><input id="propPagamento" value="50% entrada / 50% conclusão"></div>
+            <div style="grid-column:1 / -1;"><label>Condições comerciais</label><textarea id="propCondicoes">Pagamento conforme medição aprovada.</textarea></div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="btnGerarProposta">Gerar proposta</button>
+            <button class="btn-secondary" id="btnVisualizarProposta">Visualizar</button>
+          </div>
+        </div>
+        <div class="box" style="overflow:visible;"><div class="small-note" style="margin-bottom:10px;">Gerar proposta mantém você dentro do sistema. Use “Baixar PDF” para gerar o arquivo ou “Visualizar / Imprimir” como alternativa.</div><div id="propostaPreview" style="overflow:visible;"></div></div>
+      </div>
+    </section>
+
+    <section id="almoxarife" class="section">
+      <div class="top-row"><h2>Almoxarife</h2></div>
+      <div class="subtabs">
+        <button class="subtab active" data-parent="almoxarife" data-sub="alm-estoque">Estoque</button>
+        <button class="subtab" data-parent="almoxarife" data-sub="alm-mov">Movimentações</button>
+        <button class="subtab" data-parent="almoxarife" data-sub="alm-resumo">Resumo</button>
+        <button class="subtab" data-parent="almoxarife" data-sub="alm-transf">Transferências</button>
+      </div>
+
+      <div id="alm-estoque" class="subpanel active">
+        <div class="box">
+          <h2>Estoque</h2>
+          <div class="form-grid">
+            <div><label>Produto</label><input id="produtoNome"></div>
+            <div><label>Unidade</label><input id="produtoUnidade"></div>
+            <div><label>Código</label><input id="produtoCodigo"></div>
+            <div><label>Mínimo</label><input id="produtoMinimo" type="number" min="0" step="0.01"></div>
+            <div><label>Custo unitário</label><input id="produtoCusto" type="number" min="0" step="0.01"></div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="btnSalvarProduto">Salvar produto</button>
+            <button class="btn-secondary" id="btnCancelarProduto">Cancelar</button>
+          </div>
+        </div>
+        <div class="box"><div id="produtosTable"></div></div>
+      </div>
+
+      <div id="alm-mov" class="subpanel">
+        <div class="box">
+          <h2>Movimentações</h2>
+          <div class="form-grid">
+            <div><label>Tipo</label><select id="movTipo"><option value="entrada">entrada</option><option value="saida">saída</option></select></div>
+            <div><label>Data</label><input id="movData" type="date"></div>
+            <div><label>Obra</label><select id="movObra"></select></div>
+            <div><label>Produto</label><select id="movProduto"></select></div>
+            <div><label>Quantidade</label><input id="movQtd" type="number" min="0" step="0.01"></div>
+            <div><label>Valor unitário</label><input id="movValor" type="number" min="0" step="0.01"></div>
+            <div style="grid-column:1 / -1;"><label>Observações</label><textarea id="movObs"></textarea></div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="btnSalvarMov">Lançar</button>
+            <button class="btn-secondary" id="btnCustoBase">Usar custo base</button>
+            <button class="btn-secondary" id="btnCancelarMov">Cancelar</button>
+          </div>
+        </div>
+        <div class="box"><div id="movimentacoesTable"></div></div>
+      </div>
+
+      <div id="alm-resumo" class="subpanel">
+        <div class="box">
+          <h2>Resumo de Estoque</h2>
+          <div class="form-grid"><div><label>Obra</label><select id="filtroObraEstoque"></select></div></div>
+        </div>
+        <div class="box"><div id="estoqueTable"></div></div>
+      </div>
+
+      <div id="alm-transf" class="subpanel">
+        <div class="box">
+          <h2>Transferências</h2>
+          <div class="form-grid">
+            <div><label>Origem</label><select id="transfOrigem"></select></div>
+            <div><label>Destino</label><select id="transfDestino"></select></div>
+            <div><label>Produto</label><select id="transfProduto"></select></div>
+            <div><label>Quantidade</label><input id="transfQtd" type="number" min="0" step="0.01"></div>
+            <div><label>Data</label><input id="transfData" type="date"></div>
+          </div>
+          <div class="actions"><button class="btn-primary" id="btnTransferir">Transferir</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="financeiro" class="section">
+      <div class="top-row"><h2>Financeiro</h2></div>
+      <div class="box">
+        <div class="form-grid">
+          <div><label>Tipo</label><select id="finTipo"><option value="pagar">Pagar</option><option value="receber">Receber</option></select></div>
+          <div><label>Descrição</label><input id="finDescricao"></div>
+          <div><label>Obra</label><select id="finObra"></select></div>
+          <div><label>Data</label><input id="finData" type="date"></div>
+          <div><label>Valor</label><input id="finValor" type="number" step="0.01"></div>
+          <div><label>Status</label><select id="finStatus"><option value="aberto">aberto</option><option value="pago">pago</option><option value="recebido">recebido</option></select></div>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" id="btnSalvarFinanceiro">Salvar lançamento</button>
+          <button class="btn-secondary" id="btnCancelarFinanceiro">Cancelar</button>
+        </div>
+      </div>
+      <div class="box"><div id="financeiroResumo" class="quick-grid"></div></div>
+      <div class="box"><div id="financeiroTable"></div></div>
+    </section>
+
+    <section id="sistema" class="section">
+      <div class="top-row"><h2>Sistema</h2></div>
+      <div class="subtabs">
+        <button class="subtab active" data-parent="sistema" data-sub="sis-config">Configurações</button>
+        <button class="subtab" data-parent="sistema" data-sub="sis-backup">Backup</button>
+      </div>
+
+      <div id="sis-config" class="subpanel active">
+        <div class="box">
+          <h2>Configurações</h2>
+          <div class="form-grid">
+            <div><label>Nome do sistema</label><input id="empresaNome"></div>
+            <div><label>Subtítulo</label><input id="empresaSubtitulo"></div>
+            <div><label>Cor principal</label><input id="empresaCor" type="color"></div>
+            <div><label>Cor secundária</label><input id="empresaCorSecundaria" type="color"></div>
+            <div><label>Logo</label><input id="empresaLogo" type="file" accept="image/*"></div>
+          </div>
+          <div class="actions">
+            <button class="btn-primary" id="btnSalvarIdentidade">Salvar identidade</button>
+            <button class="btn-secondary" id="btnRestaurarPadrao">Restaurar</button>
+            <button class="btn-danger" id="btnLimparCache">Limpar cache local</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="sis-backup" class="subpanel">
+        <div class="box">
+          <h2>Backup</h2>
+          <div class="actions">
+            <button class="btn-primary" id="btnExportarBackup">Exportar backup</button>
+            <label class="btn-secondary" style="display:inline-block;">Importar backup
+              <input id="importBackupFile" type="file" accept="application/json" style="display:none;">
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="proposalScreen" class="proposal-screen">
+    <div class="proposal-sheet">
+      <div class="proposal-top">
+        <div class="proposal-brand">
+          <img id="proposalLogo" alt="logo">
+          <div><h1 id="proposalBrandName">Obra Nova</h1><small id="proposalBrandSub">Sistema de gestão de obras</small></div>
+        </div>
+        <div style="text-align:right"><strong>PROPOSTA COMERCIAL</strong><br><span id="proposalDate"></span></div>
+      </div>
+      <div class="proposal-grid">
+        <div><strong>Cliente:</strong> <span id="proposalCliente"></span></div>
+        <div><strong>Obra:</strong> <span id="proposalObra"></span></div>
+        <div><strong>Prazo:</strong> <span id="proposalPrazo"></span></div>
+        <div><strong>Validade:</strong> <span id="proposalValidade"></span></div>
+      </div>
+      <div style="margin-top:18px" class="table-wrap"><table><thead><tr><th>Item</th><th>Qtd.</th><th>Unitário</th><th>Total</th></tr></thead><tbody id="proposalBody"></tbody></table></div>
+      <div class="proposal-total" id="proposalTotal">R$ 0,00</div>
+      <div class="proposal-footer">
+        <p><strong>Forma de pagamento:</strong> <span id="proposalPagamento"></span></p>
+        <p><strong>Condições comerciais:</strong> <span id="proposalCondicoes"></span></p>
+        <br><br>_____________________________________<br>Gabriel Filipe<br>JOTACON CONSTRUÇÕES LTDA
+      </div>
+      <div class="actions" id="proposalActions">
+        <button class="btn-primary" id="btnPrintProposal">Imprimir / PDF</button>
+        <button class="btn-secondary" id="btnCloseProposal">Voltar ao sistema</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="data/sinapi-composicoes.js"></script>
+  <script src="js/01-core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="js/02-rdo.js"></script>
+  <script src="js/03-auth.js"></script>
+  <script src="js/04-sections-builder.js"></script>
+  <script src="js/05-linked-modules.js"></script>
+</body>
+</html>
