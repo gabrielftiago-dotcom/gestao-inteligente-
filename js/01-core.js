@@ -9,7 +9,7 @@
     const editing = { clienteId:null, obraId:null, composicaoId:null, produtoId:null, movId:null, orcId:null, financeiroId:null };
     let filtroTipoBase = '';
 
-    function uid(){ return Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
+    function uid(){ return (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0; return (c === 'x' ? r : (r&0x3|0x8)).toString(16); }); }
     function num(v){ return Number(v || 0); }
     function money(v){ return Number(v || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
     function qty(v){ return Number(v || 0).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:2}); }

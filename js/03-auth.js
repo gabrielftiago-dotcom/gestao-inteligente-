@@ -333,15 +333,17 @@
       overlay.innerHTML = `
         <div class="auth-card">
           <h2>Login</h2>
-          <div class="small-note" style="margin-bottom:12px;">Entre com usuário e senha para usar o sistema.</div>
+          <div class="small-note" style="margin-bottom:12px;">Entre com seu e-mail e senha da conta na nuvem.</div>
           <div class="form-grid">
-            <div><label>Usuário</label><input id="authLoginUser" autocomplete="username"></div>
+            <div><label>E-mail</label><input id="authLoginUser" type="email" autocomplete="username"></div>
             <div><label>Senha</label><input id="authLoginPass" type="password" autocomplete="current-password"></div>
           </div>
+          <div id="authLoginError" class="small-note" style="color:var(--danger);display:none;"></div>
           <div class="actions">
             <button class="btn-primary" id="btnAuthLogin" type="button">Entrar</button>
+            <button class="btn-secondary" id="btnAuthSignup" type="button">Criar conta</button>
           </div>
-          <div class="small-note">Primeiro acesso: usuário <strong>admin</strong> e senha <strong>admin123</strong>.</div>
+          <div class="small-note">Primeiro acesso? Informe e-mail e senha (mín. 6 caracteres) e clique em "Criar conta".</div>
         </div>
       `;
       document.body.appendChild(overlay);
@@ -577,20 +579,77 @@
       resetAccessUserForm();
     }
 
-    function attemptLogin(){
-      const username = normalizeUsername(document.getElementById('authLoginUser')?.value || '');
-      const password = document.getElementById('authLoginPass')?.value || '';
-      if(!username || !password) return alert('Informe usuário e senha.');
-      const user = authState.users.find(u => normalizeUsername(u.username) === username && u.password === password);
-      if(!user) return alert('Usuário ou senha inválidos.');
+    function showAuthError(msg){
+      const el = document.getElementById('authLoginError');
+      if(!el) return;
+      if(!msg){ el.style.display = 'none'; el.textContent = ''; return; }
+      el.textContent = msg;
+      el.style.display = '';
+    }
 
+    function provisionLocalUserForCloudSession(cloudUser){
+      const username = normalizeUsername(cloudUser.email);
+      let user = authState.users.find(u => normalizeUsername(u.username) === username);
+      if(!user){
+        user = { id: cloudUser.id, username: cloudUser.email, password: '', role: 'admin', menus: allMenuIds() };
+        authState.users.unshift(user);
+        saveAuthState();
+      }
+      return user;
+    }
+
+    async function completeCloudLogin(cloudUser){
+      const user = provisionLocalUserForCloudSession(cloudUser);
       setSession(user);
       hideLoginOverlay();
+      showAuthError('');
       applyMenuPermissions();
       renderUsersTable();
+      if(typeof window.onCloudAuthReady === 'function'){
+        await window.onCloudAuthReady(cloudUser);
+      }
       const desired = localStorage.getItem(SECTION_STORAGE_KEY) || firstAllowedSection();
       secureShowSection(desired, true);
       closeMenuIfOpen();
+    }
+
+    async function attemptLogin(){
+      const email = (document.getElementById('authLoginUser')?.value || '').trim();
+      const password = document.getElementById('authLoginPass')?.value || '';
+      if(!email || !password) return showAuthError('Informe e-mail e senha.');
+      const btn = document.getElementById('btnAuthLogin');
+      if(btn) btn.disabled = true;
+      try{
+        const { data, error } = await window.cloud.signIn(email, password);
+        if(error) return showAuthError(error.message === 'Invalid login credentials' ? 'E-mail ou senha inválidos.' : error.message);
+        await completeCloudLogin(data.user);
+      }catch(e){
+        showAuthError('Falha ao conectar. Verifique sua internet.');
+      }finally{
+        if(btn) btn.disabled = false;
+      }
+    }
+
+    async function attemptSignup(){
+      const email = (document.getElementById('authLoginUser')?.value || '').trim();
+      const password = document.getElementById('authLoginPass')?.value || '';
+      if(!email || !password) return showAuthError('Informe e-mail e senha.');
+      if(password.length < 6) return showAuthError('A senha precisa ter ao menos 6 caracteres.');
+      const btn = document.getElementById('btnAuthSignup');
+      if(btn) btn.disabled = true;
+      try{
+        const { data, error } = await window.cloud.signUp(email, password);
+        if(error) return showAuthError(error.message);
+        if(data.session && data.user){
+          await completeCloudLogin(data.user);
+        }else{
+          showAuthError('Conta criada. Verifique seu e-mail para confirmar o acesso, depois faça login.');
+        }
+      }catch(e){
+        showAuthError('Falha ao conectar. Verifique sua internet.');
+      }finally{
+        if(btn) btn.disabled = false;
+      }
     }
 
     function closeMenuIfOpen(){
@@ -605,6 +664,7 @@
       authEventsBound = true;
 
       document.getElementById('btnAuthLogin')?.addEventListener('click', attemptLogin);
+      document.getElementById('btnAuthSignup')?.addEventListener('click', attemptSignup);
       document.getElementById('authLoginPass')?.addEventListener('keydown', ev => {
         if(ev.key === 'Enter') attemptLogin();
       });
@@ -612,8 +672,9 @@
         if(ev.key === 'Enter') attemptLogin();
       });
 
-      document.getElementById('btnAuthLogout')?.addEventListener('click', () => {
+      document.getElementById('btnAuthLogout')?.addEventListener('click', async () => {
         if(!confirm('Deseja sair da conta atual?')) return;
+        try{ await window.cloud.signOut(); }catch(e){}
         clearSession();
         applyMenuPermissions();
         showLoginOverlay();
@@ -640,7 +701,7 @@
       }
     }
 
-    function initializeAuthModule(){
+    async function initializeAuthModule(){
       ensureAuthStyles();
       ensureHeaderAuthControls();
       ensureLoginOverlay();
@@ -649,8 +710,6 @@
 
       resetAccessUserForm();
       renderUsersTable();
-
-      currentUser = getSessionUser();
       updateHeaderUser();
 
       window.showSection = function(sectionId){
@@ -661,14 +720,16 @@
         secureShowSection(desired, true);
       };
 
-      if(currentUser){
-        applyMenuPermissions();
-        const desired = localStorage.getItem(SECTION_STORAGE_KEY) || firstAllowedSection();
-        secureShowSection(desired, true);
-      }else{
-        applyMenuPermissions();
-        showLoginOverlay();
-      }
+      applyMenuPermissions();
+
+      try{
+        const session = await window.cloud.getSession();
+        if(session && session.user){
+          await completeCloudLogin(session.user);
+          return;
+        }
+      }catch(e){}
+      showLoginOverlay();
     }
 
     if(document.readyState === 'loading'){
